@@ -12,6 +12,9 @@ files:
 publish:
   provider: github
   releaseType: release
+  # 자동 업데이트 관련 설정
+  allowPrerelease: false
+  allowDowngrade: false
 
 # Windows 설정
 win:
@@ -34,8 +37,3 @@ mac:
         - x64
         - arm64
   category: public.app-category.developer-tools
-
-# 자동 업데이트 설정
-updater:
-  allowPrerelease: false
-  allowDowngrade: false
