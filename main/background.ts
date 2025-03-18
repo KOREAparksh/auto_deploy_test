@@ -32,6 +32,8 @@ if (!gotTheLock) {
   autoUpdater.autoDownload = true;
   // 앱 종료 시 자동 설치 비활성화 - 대신 즉시 설치하도록 변경
   autoUpdater.autoInstallOnAppQuit = false;
+  // 업데이트 설치 후 자동으로 앱 실행
+  autoUpdater.autoRunAppAfterInstall = true;
 }
 
 // 자동 업데이트 추가 설정
@@ -129,6 +131,9 @@ function setupAutoUpdater(mainWindow) {
       console.log("업데이트 설치 및 앱 재시작...");
       console.log(`앱 경로: ${appPath}`);
       console.log(`앱 인자: ${appArgs.join(" ")}`);
+
+      // 설치 후 앱 재시작 플래그 설정
+      autoUpdater.autoRunAppAfterInstall = true;
 
       // 자동으로 설치 및 재시작
       // 첫 번째 매개변수: isSilent - 사용자에게 알림 없이 자동 업데이트
