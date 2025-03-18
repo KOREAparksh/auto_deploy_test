@@ -110,12 +110,12 @@ function setupAutoUpdater(mainWindow) {
 
 // 정기적인 업데이트 확인 설정
 function setupPeriodicUpdates() {
-  // 1시간마다 업데이트 확인
-  const ONE_HOUR = 60 * 60 * 1000;
+  // 1분마다 업데이트 확인
+  const ONE_MINUTE = 60 * 1000;
   setInterval(() => {
     console.log("정기 업데이트 확인 중...");
     autoUpdater.checkForUpdates();
-  }, ONE_HOUR);
+  }, ONE_MINUTE);
 }
 
 (async () => {
@@ -138,11 +138,11 @@ function setupPeriodicUpdates() {
     // 정기적인 업데이트 확인 설정
     setupPeriodicUpdates();
 
-    // 앱 시작 10초 후 업데이트 확인 (앱이 완전히 로드된 후)
+    // 앱 시작 5초 후 업데이트 확인 (앱이 완전히 로드된 후)
     setTimeout(() => {
       console.log("앱 시작 후 첫 업데이트 확인...");
       autoUpdater.checkForUpdates();
-    }, 10000);
+    }, 5000);
   } else {
     const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/home`);
