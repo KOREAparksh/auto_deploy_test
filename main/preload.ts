@@ -24,6 +24,17 @@ contextBridge.exposeInMainWorld("electron", {
       ipcRenderer.send("get-app-version");
     });
   },
+  checkForUpdates: () => {
+    ipcRenderer.send("check-for-updates");
+  },
+  onUpdateStatus: (callback: (status: any) => void) => {
+    const subscription = (_event: IpcRendererEvent, status: any) => callback(status);
+    ipcRenderer.on("update-status", subscription);
+
+    return () => {
+      ipcRenderer.removeListener("update-status", subscription);
+    };
+  },
 });
 
 contextBridge.exposeInMainWorld("ipc", handler);

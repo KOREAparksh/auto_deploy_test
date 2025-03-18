@@ -5,6 +5,8 @@ declare global {
     ipc: IpcHandler;
     electron: {
       getAppVersion: () => Promise<string>;
+      checkForUpdates: () => void;
+      onUpdateStatus: (callback: (status: any) => void) => () => void;
     };
   }
 }

@@ -9,4 +9,33 @@ files:
     filter:
       - package.json
       - app
-publish: null
+publish:
+  provider: github
+  releaseType: release
+
+# Windows 설정
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  # Windows 코드 서명 설정 (선택 사항)
+  # certificateFile: path/to/certificate.pfx
+  # certificatePassword: certificate_password
+  # signingHashAlgorithms: ['sha256']
+  # Optional - 자동 업데이트 설정
+  publisherName: ["My Publisher Name"]
+
+# macOS 설정
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.developer-tools
+
+# 자동 업데이트 설정
+updater:
+  allowPrerelease: false
+  allowDowngrade: false
