@@ -1,6 +1,6 @@
-appId: com.example.nextron
+appId: com.myapp.nextron
 productName: My Nextron App
-copyright: Copyright © 2018 Yoshihide Shiono
+copyright: Copyright © 2023 ${author}
 directories:
   output: dist
   buildResources: resources
@@ -9,38 +9,29 @@ files:
     filter:
       - package.json
       - app
-publish:
-  provider: github
-  releaseType: release
-
-# Windows 설정
 win:
   target:
-    - target: nsis
-      arch:
-        - x64
-  # Windows 코드 서명 설정 (선택 사항)
-  # certificateFile: path/to/certificate.pfx
-  # certificatePassword: certificate_password
-  # signingHashAlgorithms: ['sha256']
-  # Optional - 자동 업데이트 설정
-  publisherName: ["My Publisher Name"]
-
-# macOS 설정
+    - nsis
+  icon: resources/icon.ico
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
 mac:
   target:
-    - target: dmg
-      arch:
-        - x64
-        - arm64
+    - dmg
+    - zip
+  icon: resources/icon.icns
   category: public.app-category.developer-tools
-
-# NSIS 설정 (Windows 인스톨러)
+  artifactName: ${productName}-${version}-${arch}.${ext}
+linux:
+  target: ["AppImage", "deb"]
+  icon: resources/icon.png
+  category: Development
+publish:
+  provider: github
+  owner: KOREAparksh
+  repo: auto_deploy_test
+  private: false
+  releaseType: release
 nsis:
-  oneClick: true
-  allowToChangeInstallationDirectory: false
-  createDesktopShortcut: true
-  runAfterFinish: true
-  allowElevation: true
-  # 업데이트 관련 설정
-  differentialPackage: true
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
