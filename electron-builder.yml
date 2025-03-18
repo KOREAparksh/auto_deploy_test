@@ -32,6 +32,12 @@ publish:
   private: false
   releaseType: release
 nsis:
-  oneClick: false
-  allowToChangeInstallationDirectory: true
+  oneClick: true
+  allowToChangeInstallationDirectory: false
   artifactName: ${productName}-Setup-${version}-${arch}.${ext}
+  perMachine: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  differentialPackage: true
+  include: build/installer.nsh

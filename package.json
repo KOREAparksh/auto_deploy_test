@@ -12,6 +12,7 @@
     "build:mac": "nextron build --mac --x64",
     "deploy:win": "yarn build:win && electron-builder --win --x64 --publish always",
     "deploy:mac": "yarn build:mac && electron-builder --mac --x64 --publish always",
+    "deploy:win:easy": "node scripts/deploy-win.js",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
