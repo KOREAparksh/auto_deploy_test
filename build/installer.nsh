@@ -22,4 +22,14 @@
       SetSilent silent
     ${EndIf}
   ${EndIf}
+!macroend
+
+; 업데이트 후 자동 실행을 위한 매크로
+!macro customUnInstall
+  !system "echo '업데이트 완료 후 자동 실행 준비'"
+!macroend
+
+; 설치 완료 후 실행 매크로
+!macro customFinishRun
+  Exec "$INSTDIR\${APP_EXECUTABLE_FILENAME}"
 !macroend 

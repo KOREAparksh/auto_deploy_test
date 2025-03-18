@@ -1,15 +1,38 @@
-import { app, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import fs from "fs";
 import path from "path";
 import { createWindow } from "./helpers";
 
-// 자동 업데이트 로깅 활성화
-autoUpdater.logger = console;
-autoUpdater.autoDownload = true;
-// 앱 종료 시 자동 설치 비활성화 - 대신 즉시 설치하도록 변경
-autoUpdater.autoInstallOnAppQuit = false;
+// 앱이 두 번째 인스턴스로 실행되는지 확인 (업데이트 후 재시작)
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // 두 번째 인스턴스면 종료
+  console.log("다른 인스턴스가 이미 실행 중입니다. 이 인스턴스를 종료합니다.");
+  app.quit();
+} else {
+  // 두 번째 인스턴스가 시작되면 첫 번째 인스턴스의 창을 포커스
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    console.log("두 번째 인스턴스가 시작되었습니다. 첫 번째 인스턴스의 창에 포커스합니다.");
+    console.log("command line arguments:", commandLine);
+
+    // 메인 윈도우가 생성된 경우
+    const windows = BrowserWindow.getAllWindows();
+    if (windows.length > 0) {
+      const mainWindow = windows[0];
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  // 자동 업데이트 로깅 활성화
+  autoUpdater.logger = console;
+  autoUpdater.autoDownload = true;
+  // 앱 종료 시 자동 설치 비활성화 - 대신 즉시 설치하도록 변경
+  autoUpdater.autoInstallOnAppQuit = false;
+}
 
 // 자동 업데이트 추가 설정
 autoUpdater.allowDowngrade = false; // 다운그레이드 방지
@@ -99,10 +122,17 @@ function setupAutoUpdater(mainWindow) {
     // 타이머 시작 - 3초 후 자동 업데이트 설치
     console.log("3초 후 자동 업데이트 설치...");
     setTimeout(() => {
+      // 앱 실행 경로 저장 (재시작을 위해)
+      const appPath = process.execPath;
+      const appArgs = process.argv.slice(1).filter((arg) => !arg.startsWith("--squirrel"));
+
+      console.log("업데이트 설치 및 앱 재시작...");
+      console.log(`앱 경로: ${appPath}`);
+      console.log(`앱 인자: ${appArgs.join(" ")}`);
+
       // 자동으로 설치 및 재시작
       // 첫 번째 매개변수: isSilent - 사용자에게 알림 없이 자동 업데이트
       // 두 번째 매개변수: isForceRunAfter - 업데이트 후 앱 자동 재시작
-      console.log("업데이트 설치 및 앱 재시작...");
       autoUpdater.quitAndInstall(true, true);
     }, 3000);
   });
