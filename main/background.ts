@@ -29,9 +29,10 @@ if (!gotTheLock) {
 
   // 자동 업데이트 로깅 활성화
   autoUpdater.logger = console;
+  // 자동 다운로드 활성화 - 앱 시작 시 업데이트가 있으면 자동으로 다운로드
   autoUpdater.autoDownload = true;
-  // 앱 종료 시 자동 설치 비활성화 - 대신 즉시 설치하도록 변경
-  autoUpdater.autoInstallOnAppQuit = false;
+  // 앱 종료 시 자동 설치 활성화
+  autoUpdater.autoInstallOnAppQuit = true;
   // 업데이트 설치 후 자동으로 앱 실행
   autoUpdater.autoRunAppAfterInstall = true;
 }
@@ -83,15 +84,6 @@ function setupAutoUpdater(mainWindow) {
     mainWindow.webContents.send("update-status", { status: "not-available" });
   });
 
-  // 오류 발생
-  autoUpdater.on("error", (err) => {
-    console.error("업데이트 오류:", err);
-    mainWindow.webContents.send("update-status", {
-      status: "error",
-      error: err.toString(),
-    });
-  });
-
   // 다운로드 진행 상황
   autoUpdater.on("download-progress", (progressObj) => {
     const logMessage = `다운로드 속도: ${progressObj.bytesPerSecond} - 진행률: ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
@@ -115,14 +107,14 @@ function setupAutoUpdater(mainWindow) {
       releaseNotes: info.releaseNotes,
     });
 
-    // 작은 알림 표시 - 사용자에게 업데이트 알림
+    // 업데이트가 준비되었음을 사용자에게 알림
     mainWindow.webContents.send("update-ready", {
       version: info.version,
       notes: info.releaseNotes,
     });
 
-    // 타이머 시작 - 3초 후 자동 업데이트 설치
-    console.log("3초 후 자동 업데이트 설치...");
+    // 5초 후 자동으로 업데이트 설치 및 앱 재시작
+    console.log("5초 후 자동 업데이트 설치...");
     setTimeout(() => {
       // 앱 실행 경로 저장 (재시작을 위해)
       const appPath = process.execPath;
@@ -132,25 +124,21 @@ function setupAutoUpdater(mainWindow) {
       console.log(`앱 경로: ${appPath}`);
       console.log(`앱 인자: ${appArgs.join(" ")}`);
 
-      // 설치 후 앱 재시작 플래그 설정
-      autoUpdater.autoRunAppAfterInstall = true;
-
       // 자동으로 설치 및 재시작
       // 첫 번째 매개변수: isSilent - 사용자에게 알림 없이 자동 업데이트
       // 두 번째 매개변수: isForceRunAfter - 업데이트 후 앱 자동 재시작
       autoUpdater.quitAndInstall(true, true);
-    }, 3000);
+    }, 5000);
   });
-}
 
-// 정기적인 업데이트 확인 설정
-function setupPeriodicUpdates() {
-  // 1분마다 업데이트 확인
-  const ONE_MINUTE = 60 * 1000;
-  setInterval(() => {
-    console.log("정기 업데이트 확인 중...");
-    autoUpdater.checkForUpdates();
-  }, ONE_MINUTE);
+  // 오류 발생
+  autoUpdater.on("error", (err) => {
+    console.error("업데이트 오류:", err);
+    mainWindow.webContents.send("update-status", {
+      status: "error",
+      error: err.toString(),
+    });
+  });
 }
 
 (async () => {
@@ -170,12 +158,9 @@ function setupPeriodicUpdates() {
     // 프로덕션 모드에서만 업데이트 설정
     setupAutoUpdater(mainWindow);
 
-    // 정기적인 업데이트 확인 설정
-    setupPeriodicUpdates();
-
-    // 앱 시작 5초 후 업데이트 확인 (앱이 완전히 로드된 후)
+    // 앱 시작 시에만 업데이트 확인 (앱이 완전히 로드된 후)
     setTimeout(() => {
-      console.log("앱 시작 후 첫 업데이트 확인...");
+      console.log("앱 시작 후 업데이트 확인...");
       autoUpdater.checkForUpdates();
     }, 5000);
   } else {
@@ -200,16 +185,4 @@ ipcMain.on("get-app-version", (event) => {
 
 ipcMain.on("message", async (event, arg) => {
   event.reply("message", `${arg} World!`);
-});
-
-// 업데이트 수동 체크 기능 추가
-ipcMain.on("check-for-updates", () => {
-  console.log("수동 업데이트 확인 요청...");
-  autoUpdater.checkForUpdates();
-});
-
-// 업데이트 수동 설치 기능 추가 (옵션)
-ipcMain.on("install-update", () => {
-  console.log("수동 업데이트 설치 요청...");
-  autoUpdater.quitAndInstall(true, true);
 });
